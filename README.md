@@ -6,19 +6,59 @@
   <title>GPS Logger Minimal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    html, body, #map { height: 100%; margin: 0; }
+    :root {
+      color-scheme: dark;
+    }
+    html, body, #map {
+      height: 100%;
+      margin: 0;
+      background: #121212;
+      color: #fff;
+      font-family: sans-serif;
+    }
     #controls {
       position: absolute;
       top: 10px;
-      left: 10px;
-      background: white;
-      padding: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
       z-index: 1000;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-      border-radius: 8px;
-      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
     }
-    #controls button { display: block; margin: 5px 0; width: 100%; height: 20%; }
+    #controls input {
+      padding: 8px;
+      border-radius: 5px;
+      border: none;
+      width: 200px;
+    }
+    #controls button {
+      padding: 15px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      width: 200px;
+      cursor: pointer;
+    }
+    #removeLast {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #8b0000;
+      color: white;
+      padding: 15px 20px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      z-index: 1000;
+    }
   </style>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -32,11 +72,13 @@
     <button onclick="logPoint('animé')">📍 Animé</button>
     <button onclick="exportGPX()">💾 Export GPX</button>
   </div>
+  <button id="removeLast" onclick="removeLastPoint()">🗑 Supprimer dernier point</button>
   <div id="map"></div>
 
   <script>
     let map = L.map('map').setView([0, 0], 2);
     let points = [];
+    let markers = [];
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
@@ -55,6 +97,8 @@
         return;
       }
 
+      if (!confirm("Voulez-vous ajouter un point de type " + type + " ?")) return;
+
       navigator.geolocation.getCurrentPosition(pos => {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
@@ -62,16 +106,31 @@
 
         points.push({ type, username, lat, lon, time });
 
-        L.marker([lat, lon])
+        let marker = L.marker([lat, lon])
           .addTo(map)
           .bindPopup(type + "<br>" + username + "<br>" + time)
           .openPopup();
 
-        console.log("Point enregistré:", type, lat, lon);
+        markers.push(marker);
+
       }, err => {
         alert("Erreur de géolocalisation.");
         console.error("Géolocalisation échouée", err);
       });
+    }
+
+    function removeLastPoint() {
+      if (points.length === 0) {
+        alert("Aucun point à supprimer.");
+        return;
+      }
+      if (!confirm("Supprimer le dernier point ajouté ?")) return;
+
+      points.pop();
+      let marker = markers.pop();
+      if (marker) {
+        map.removeLayer(marker);
+      }
     }
 
     function exportGPX() {
