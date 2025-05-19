@@ -1,9 +1,7 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>GPS Logger Minimal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
@@ -65,13 +63,15 @@
 </head>
 <body>
   <div id="controls">
-    <label for="username">Nom utilisateur :</label>
-    <input type="text" id="username" placeholder="ex: alice" />
+    <input type="text" id="username" placeholder="Nom utilisateur" />
+    Enregistrer un nouveau point :
     <button onclick="logPoint('3x4')">📍 3x4</button>
     <button onclick="logPoint('sucette')">📍 Sucette</button>
     <button onclick="logPoint('animé')">📍 Animé</button>
-    <button onclick="exportGPX()">💾 Export GPX</button>
   </div>
+  <p>
+    <button onclick="exportGPX()">💾 Export GPX</button>
+  </p>
   <button id="removeLast" onclick="removeLastPoint()">🗑 Supprimer dernier point</button>
   <div id="map"></div>
 
