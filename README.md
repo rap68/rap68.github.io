@@ -57,11 +57,11 @@
       z-index: 1000;
     }
     #export {
-      position: absolute;
+      position: relative;
       bottom: 50px;
       left: 50%;
       transform: translateX(-50%);
-      background: #8b0000;
+      background: #1e1e1e;
       color: white;
       padding: 15px 20px;
       font-size: 1rem;
