@@ -6,12 +6,20 @@
     :root {
       color-scheme: dark;
     }
-    html, body, #map {
+    html, body {
       height: 100%;
       margin: 0;
       background: #121212;
       color: #fff;
       font-family: sans-serif;
+    }
+    #map{
+      height: 100%;
+      margin: 0;
+      background: #121212;
+      color: #fff;
+      font-family: sans-serif;
+      visibility: hidden;
     }
     #controls {
       position: absolute;
@@ -26,7 +34,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 30px;
     }
     #controls input {
       padding: 8px;
@@ -57,11 +65,11 @@
       z-index: 1000;
     }
     #export {
-      position: relative;
-      bottom: 50px;
+      position: absolute;
+      top: 75%;
       left: 50%;
       transform: translateX(-50%);
-      background: #1e1e1e;
+      background: darkgreen;
       color: white;
       padding: 15px 20px;
       font-size: 1rem;
@@ -109,7 +117,7 @@
         return;
       }
 
-      if (!confirm("Voulez-vous ajouter un point de type " + type + " ?")) return;
+    //   if (!confirm("Voulez-vous ajouter un point de type " + type + " ?")) return;
 
       navigator.geolocation.getCurrentPosition(pos => {
         const lat = pos.coords.latitude;
