@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
@@ -57,6 +56,21 @@
       cursor: pointer;
       z-index: 1000;
     }
+    #export {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #8b0000;
+      color: white;
+      padding: 15px 20px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
   </style>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -69,9 +83,7 @@
     <button onclick="logPoint('sucette')">📍 Sucette</button>
     <button onclick="logPoint('animé')">📍 Animé</button>
   </div>
-  <p>
-    <button onclick="exportGPX()">💾 Export GPX</button>
-  </p>
+  <button id="export" onclick="exportGPX()">💾 Export GPX</button>
   <button id="removeLast" onclick="removeLastPoint()">🗑 Supprimer dernier point</button>
   <div id="map"></div>
 
