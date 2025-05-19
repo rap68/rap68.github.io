@@ -1,1 +1,0 @@
-Poseur de points GPS
