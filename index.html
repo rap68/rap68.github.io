@@ -29,18 +29,28 @@
     button:hover {
       background-color: #444;
     }
+    #export {
+      background-color: #226622;
+      margin-top: 3rem;
+    }
+    #export:hover {
+      background-color: #2d7c2d;
+    }
     #remove {
       background-color: #882222;
-      margin-top: 3rem;
+      margin-top: 4rem;
+    }
+    #remove:hover {
+      background-color: #aa3333;
     }
   </style>
 </head>
 <body>
   <h1>Enregistrement GPS</h1>
-  <button onclick="addPoint('3x4')">Ajouter 3x4</button>
+  <button onclick="addPoint('4x3')">Ajouter 4x3</button>
   <button onclick="addPoint('sucette')">Ajouter sucette</button>
   <button onclick="addPoint('animé')">Ajouter animé</button>
-  <button onclick="exportData()">Exporter en ZIP</button>
+  <button id="export" onclick="exportData()">Exporter en ZIP</button>
   <button id="remove" onclick="removeLast()">Supprimer dernier point</button>
 
   <script>
@@ -48,7 +58,6 @@
     let username = prompt("Entrez votre nom :");
 
     function addPoint(type) {
-      if (!confirm(`Voulez-vous ajouter un point de type "${type}" ?`)) return;
       if (!navigator.geolocation) {
         alert("La géolocalisation n'est pas supportée");
         return;
@@ -95,7 +104,8 @@
         alert("Aucun point à retirer.");
         return;
       }
-      if (confirm("Supprimer le dernier point ajouté ?")) {
+      const last = points[points.length - 1];
+      if (confirm(`Supprimer le dernier point de type "${last.type}" ?`)) {
         points.pop();
         alert("Dernier point supprimé.");
       }
