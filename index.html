@@ -66,7 +66,6 @@
         (position) => {
           const { latitude, longitude } = position.coords;
           points.push({ lat: latitude, lon: longitude, type, user: username });
-
         },
         () => alert("Erreur de géolocalisation.")
       );
@@ -105,7 +104,10 @@
         return;
       }
       const last = points[points.length - 1];
-      points.pop();
+      if (confirm(`Supprimer le dernier point de type "${last.type}" ?`)) {
+        points.pop();
+        alert("Dernier point supprimé.");
+      }
     }
   </script>
 </body>
