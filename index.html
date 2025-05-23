@@ -2,100 +2,107 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
+  <title>Collecte GPS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GPS Logger Simple</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     body {
       background-color: #121212;
-      color: #eee;
+      color: #ffffff;
       font-family: sans-serif;
       text-align: center;
-      padding: 2rem;
+      padding: 2em;
+      position: relative;
     }
+
+    #counter {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      text-align: left;
+      font-size: 0.9em;
+      line-height: 1.4em;
+    }
+
     button {
       display: block;
-      margin: 1rem auto;
-      padding: 1.2rem 2rem;
-      font-size: 1.3rem;
+      margin: 1em auto;
+      padding: 1em 2em;
+      font-size: 1.2em;
       border: none;
       border-radius: 8px;
-      background-color: #333;
-      color: white;
       cursor: pointer;
-      width: 80%;
-      max-width: 300px;
+      width: 60%;
+      transition: background-color 0.3s;
     }
-    button:hover {
-      background-color: #444;
-    }
-    #export {
-      background-color: #226622;
-      margin-top: 3rem;
-    }
-    #export:hover {
-      background-color: #2d7c2d;
-    }
-    #remove {
-      background-color: #882222;
-      margin-top: 4rem;
-    }
-    #remove:hover {
-      background-color: #aa3333;
-    }
+
+    .btn-4x3 { background-color: #1e88e5; }
+    .btn-sucette { background-color: #43a047; }
+    .btn-anime { background-color: #8e24aa; }
+    .btn-export { background-color: #2e7d32; margin-top: 3em; }
+    .btn-remove { background-color: #b71c1c; margin-top: 4em; }
+
+    .active { filter: brightness(180%); }
   </style>
 </head>
 <body>
-  <h1>Enregistrement GPS</h1>
-  <button onclick="addPoint('4x3')">Ajouter 4x3</button>
-  <button onclick="addPoint('sucette')">Ajouter sucette</button>
-  <button onclick="addPoint('animé')">Ajouter animé</button>
-  <button id="export" onclick="exportData()">Exporter en ZIP</button>
-  <button id="remove" onclick="removeLast()">Supprimer dernier point</button>
+  <div id="counter"></div>
+
+  <h1>Collecte GPS</h1>
+
+  <button class="btn-4x3" onclick="addPoint('4x3', this)">Ajouter 4x3</button>
+  <button class="btn-sucette" onclick="addPoint('sucette', this)">Ajouter sucette</button>
+  <button class="btn-anime" onclick="addPoint('animé', this)">Ajouter animé</button>
+  <button class="btn-export" onclick="exportData()">Exporter GPX</button>
+  <button class="btn-remove" onclick="removeLast()">Supprimer dernier point</button>
 
   <script>
     let points = [];
-    let username = prompt("Entrez votre nom :");
+    let username = localStorage.getItem("username") || prompt("Entrez votre nom :");
 
-    function addPoint(type) {
+    if (!localStorage.getItem("username")) {
+      localStorage.setItem("username", username);
+    }
+
+    const saved = localStorage.getItem("gps_points");
+    if (saved) {
+      try {
+        points = JSON.parse(saved);
+      } catch (e) {
+        points = [];
+      }
+    }
+
+    function savePoints() {
+      localStorage.setItem("gps_points", JSON.stringify(points));
+      updateCounter();
+    }
+
+    function updateCounter() {
+      const counts = { "4x3": 0, "sucette": 0, "animé": 0 };
+      for (const p of points) counts[p.type]++;
+      document.getElementById("counter").innerText =
+        `4x3 : ${counts["4x3"]}\nSucette : ${counts["sucette"]}\nAnimé : ${counts["animé"]}`;
+    }
+
+    function animateButton(btn) {
+      btn.classList.add("active");
+      setTimeout(() => btn.classList.remove("active"), 1000);
+    }
+
+    function addPoint(type, button) {
+      animateButton(button);
       if (!navigator.geolocation) {
-        alert("La géolocalisation n'est pas supportée");
+        alert("La géolocalisation n'est pas supportée par ce navigateur.");
         return;
       }
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           points.push({ lat: latitude, lon: longitude, type, user: username });
+          savePoints();
         },
         () => alert("Erreur de géolocalisation.")
       );
-    }
-
-    function exportData() {
-      if (points.length === 0) {
-        alert("Aucun point à exporter.");
-        return;
-      }
-
-      let gpx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-      gpx += `<gpx version="1.1" creator="Simple GPS App">\n`;
-      points.forEach((pt) => {
-        gpx += `  <wpt lat="${pt.lat}" lon="${pt.lon}">\n`;
-        gpx += `    <name>${pt.type}</name>\n`;
-        gpx += `    <desc>${pt.user}</desc>\n`;
-        gpx += `  </wpt>\n`;
-      });
-      gpx += `</gpx>`;
-
-      const zip = new JSZip();
-      zip.file(`points_${username}.gpx`, gpx);
-      zip.generateAsync({ type: "blob" }).then((blob) => {
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = `points_${username}.zip`;
-        a.click();
-        URL.revokeObjectURL(a.href);
-      });
     }
 
     function removeLast() {
@@ -106,9 +113,37 @@
       const last = points[points.length - 1];
       if (confirm(`Supprimer le dernier point de type "${last.type}" ?`)) {
         points.pop();
+        savePoints();
         alert("Dernier point supprimé.");
       }
     }
+
+    function exportData() {
+      if (points.length === 0) {
+        alert("Aucun point à exporter.");
+        return;
+      }
+
+      const gpxHeader = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Collecte GPS" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata><name>Export ${username}</name></metadata>`;
+      const gpxPoints = points.map(p => 
+        `<wpt lat="${p.lat}" lon="${p.lon}">
+          <name>${p.type} - ${p.user}</name>
+        </wpt>`).join("\n");
+      const gpxFooter = "</gpx>";
+      const gpxData = `${gpxHeader}\n${gpxPoints}\n${gpxFooter}`;
+
+      const blob = new Blob([gpxData], { type: "application/gpx+xml" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `points_${username}_${new Date().toISOString().slice(0,19).replace(/:/g, "-")}.gpx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    updateCounter(); // afficher au chargement
   </script>
 </body>
 </html>
