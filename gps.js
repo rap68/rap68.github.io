@@ -34,36 +34,17 @@ function updateCounter() {
 }
 
 function addPoint(type) {
-  setStatus("Localisation en cours...");
-
+  if (!navigator.geolocation) {
+    alert("La géolocalisation n'est pas supportée par ce navigateur.");
+    return;
+  }
   navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const { latitude, longitude, accuracy } = pos.coords;
-
-      const point = {
-        lat: latitude,
-        lon: longitude,
-        time: new Date().toISOString(),
-        type: type,
-        accuracy: accuracy
-      };
-
-      points.push(point);
-      compteur++;
-      updateCounter();
-      setStatus(`Point ajouté (±${Math.round(accuracy)}m)`);
-      setTimeout(() => setStatus(""), 3000);
-    },
-    (err) => {
-      console.error(err);
-      setStatus("Erreur GPS");
-      setTimeout(() => setStatus(""), 3000);
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
-    }
+  (position) => {
+    const { latitude, longitude } = position.coords;
+    points.push({ lat: latitude, lon: longitude, type, user: username });
+    savePoints();
+  },
+  () => alert("Erreur de géolocalisation.")
   );
 }
 
