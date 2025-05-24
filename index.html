@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Collecte GPS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="counter"></div>
+  <div id="status"></div>
+
+  <h1>Collecte GPS</h1>
+
+  <button class="btn-pub" onclick="addPoint('4x3')">Ajouter 4x3</button>
+  <button class="btn-pub" onclick="addPoint('sucette')">Ajouter sucette</button>
+  <button class="btn-pub" onclick="addPoint('animé')">Ajouter animé</button>
+  <button class="btn-export" onclick="exportData()">Exporter GPX</button>
+  <button class="btn-remove" onclick="removeLast()">Supprimer dernier point</button>
+
+  <script src="gps.js"> </script>
+</body>
+</html>
