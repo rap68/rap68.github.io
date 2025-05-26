@@ -15,8 +15,9 @@ This is a lightweight web app for collecting GPS points with labels and exportin
 1. Open the app on a device with geolocation (smartphone recommended).
 2. Allow location access when prompted.
 3. Press one of the buttons to record a GPS point with the corresponding label.
-4. Use the "Export GPX" button to download all recorded points.
-5. If needed, remove the last point with the "Delete Last Point" button.
+4. If needed, remove the last point with the "Delete Last Point" button.
+5. Use the "Export GPX" button to download all recorded points.
+6. Send / import the gpx file into the mapping app of your choice
 
 ## Tech Stack
 
