@@ -27,6 +27,6 @@ This is a lightweight web app for collecting GPS points with labels and exportin
 
 ## Limitations
 
-- Geolocation may take a few seconds to lock; wait for confirmation message.
+- Geolocation may take a few seconds to lock
 - Accuracy depends on device and surroundings (usually ±5–15 meters).
 - No map preview or real-time tracking (by design — minimal and offline-friendly)
