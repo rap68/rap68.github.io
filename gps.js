@@ -1,4 +1,5 @@
 let points = [];
+let watchId = null;
 const statusEl = document.getElementById("status");
 document.body.appendChild(statusEl);
 let username = localStorage.getItem("username") || prompt("Entrez votre nom :");
@@ -34,17 +35,44 @@ function updateCounter() {
 }
 
 function addPoint(type) {
-  if (!navigator.geolocation) {
-    alert("La géolocalisation n'est pas supportée par ce navigateur.");
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(
-  (position) => {
-    const { latitude, longitude } = position.coords;
-    points.push({ lat: latitude, lon: longitude, type, user: username });
-    savePoints();
-  },
-  () => alert("Erreur de géolocalisation.")
+  setStatus("Fixing GPS…");
+
+  watchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      const { latitude, longitude, accuracy } = pos.coords;
+
+      setStatus(`Waiting for good fix… (±${Math.round(accuracy)}m)`);
+
+      if (accuracy <= 10) {
+        const point = {
+          lat: latitude,
+          lon: longitude,
+          time: new Date().toISOString(),
+          type: type,
+          accuracy: accuracy
+        };
+
+        points.push(point);
+        compteur++;
+        updateCounter();
+
+        setStatus(`Point added (±${Math.round(accuracy)}m)`);
+        setTimeout(() => setStatus(""), 3000);
+
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
+    },
+    (err) => {
+      console.error(err);
+      setStatus("GPS error");
+      setTimeout(() => setStatus(""), 3000);
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 20000,
+      maximumAge: 0
+    }
   );
 }
 
